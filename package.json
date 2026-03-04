@@ -5,10 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/api/index.ts",
+    "dev:api": "tsx watch src/api/index.ts",
+    "dev:worker": "tsx watch src/worker/index.ts",
     "build": "tsc",
     "start": "node dist/api/index.js",
-    "worker": "node dist/worker/index.js"
+    "worker": "node dist/worker/index.js",
+    "serve": "npm run build && npm start"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +26,7 @@
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
     "express": "^5.2.1",
-    "pg": "^8.19.0"
+    "pg": "^8.19.0",
+    "postgres": "^3.4.8"
   }
 }
