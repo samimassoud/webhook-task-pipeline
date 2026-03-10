@@ -1,0 +1,1 @@
+// Routes should be thin.
