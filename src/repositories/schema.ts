@@ -1,0 +1,139 @@
+import {
+    pgTable,
+    uuid,
+    text,
+    jsonb,
+    timestamp,
+    integer,
+    pgEnum
+} from "drizzle-orm/pg-core";
+
+/* =========================
+   ENUMS
+========================= */
+
+export const jobStatusEnum = pgEnum("job_status", [
+    "queued",
+    "processing",
+    "success",
+    "failed",
+]);
+
+export const webhookStatusEnum = pgEnum("webhook_status", [
+    "pending",
+    "delivered",
+    "failed",
+    "skipped",
+]);
+
+/* =========================
+   PIPELINES
+========================= */
+
+export const pipelines = pgTable("pipelines", {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    name: text("name").notNull(),
+
+    processorType: text("processor_type").notNull(),
+
+    config: jsonb("config").notNull().default({}),
+
+    signingSecret: text("signing_secret").notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/* =========================
+   SUBSCRIPTIONS
+========================= */
+
+export const subscriptions = pgTable("subscriptions", {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    pipelineId: uuid("pipeline_id")
+        .notNull()
+        .references(() => pipelines.id, { onDelete: "cascade" }),
+
+    callbackUrl: text("callback_url").notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* =========================
+   JOBS
+========================= */
+
+export const jobs = pgTable("jobs", {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    pipelineId: uuid("pipeline_id")
+        .notNull()
+        .references(() => pipelines.id),
+
+    payload: jsonb("payload").notNull(),
+
+    result: jsonb("result"),
+
+    errorMessage: text("error_message"),
+
+    status: jobStatusEnum("status")
+        .notNull()
+        .default("queued"),
+
+    webhookStatus: webhookStatusEnum("webhook_status")
+        .notNull()
+        .default("pending"),
+
+    webhookAttempts: integer("webhook_attempts")
+        .notNull()
+        .default(0),
+
+    nextWebhookAttemptAt: timestamp("next_webhook_attempt_at")
+        .defaultNow(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+
+    startedAt: timestamp("started_at"),
+
+    finishedAt: timestamp("finished_at"),
+});
+
+/* =========================
+   DELIVERY ATTEMPTS
+========================= */
+
+export const deliveryAttempts = pgTable("delivery_attempts", {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    jobId: uuid("job_id")
+        .notNull()
+        .references(() => jobs.id),
+
+    subscriptionId: uuid("subscription_id")
+        .notNull()
+        .references(() => subscriptions.id),
+
+    attemptNumber: integer("attempt_number").notNull(),
+
+    statusCode: integer("status_code"),
+
+    responseBody: text("response_body"),
+
+    errorMessage: text("error_message"),
+
+    attemptedAt: timestamp("attempted_at")
+        .defaultNow()
+        .notNull(),
+});
+
+export type Pipeline = typeof pipelines.$inferSelect;
+export type NewPipeline = typeof pipelines.$inferInsert;
+
+export type Job = typeof jobs.$inferSelect;
+export type NewJob = typeof jobs.$inferInsert;
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type NewSubscription = typeof subscriptions.$inferInsert;

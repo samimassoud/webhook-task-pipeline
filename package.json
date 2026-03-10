@@ -10,7 +10,9 @@
     "build": "tsc",
     "start": "node dist/api/index.js",
     "worker": "node dist/worker/index.js",
-    "serve": "npm run build && npm start"
+    "serve": "npm run build && npm start",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
   },
   "keywords": [],
   "author": "",
