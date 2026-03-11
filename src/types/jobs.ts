@@ -5,3 +5,4 @@ export interface JobResult {
   error?: string
 }
 */
+export type JobStatus = "queued" | "processing" | "success" | "failed";

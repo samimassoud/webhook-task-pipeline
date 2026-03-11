@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db.js";
-import { NewPipeline, pipelines } from "../schema.js";
+import { NewPipeline, NewSubscription, pipelines, subscriptions } from "../schema.js";
 
 export async function createPipeline(data: NewPipeline) {
     const [result] = await db.insert(pipelines).values(data).returning();
@@ -13,7 +13,7 @@ export async function listPipelines() {
     return result;
 }
 
-export async function getPipeline(id: string) {
+export async function getPipelineById(id: string) {
     const [result] = await db.select()
         .from(pipelines)
         .where(eq(pipelines.id, id))

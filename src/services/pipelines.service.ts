@@ -1,7 +1,9 @@
 // Business Logic
-import { NewPipeline } from "../repositories/schema.js";
-import { createPipeline, deletePipeline, getPipeline, listPipelines, updatePipeline } from "../repositories/queries/pipelines.js";
+import { NewPipeline, NewSubscription } from "../repositories/schema.js";
+import { createPipeline, deletePipeline, getPipelineById, listPipelines, updatePipeline } from "../repositories/queries/pipelines.js";
 import { processorRegistry } from "../processors/registry.js";
+import { addSubscriptionSchema } from "../validation/jobs.schema.js";
+import { addSubscription, deleteSubscription, getSubscription, listSubscriptions } from "../repositories/queries/subscriptions.js";
 
 export async function createPipelineService(data: NewPipeline) {
     const processor = processorRegistry[data.processorType];
@@ -22,14 +24,14 @@ export async function listPipelinesService() {
 }
 
 export async function getPipelineService(id: string) {
-    return getPipeline(id);
+    return getPipelineById(id);
 }
 
 export async function updatePipelineService(id: string, data: Partial<NewPipeline>) {
     if (Object.keys(data).length === 0) {
         throw new Error("No fields provided for update");
     }
-    const existing = await getPipeline(id);
+    const existing = await getPipelineById(id);
     if (!existing) {
         throw new Error("Pipeline to be updated was not found");
     }
@@ -49,7 +51,7 @@ export async function updatePipelineService(id: string, data: Partial<NewPipelin
 }
 
 export async function deletePipelineService(id: string) {
-    const existing = await getPipeline(id);
+    const existing = await getPipelineById(id);
 
     if (!existing) {
         throw new Error("Pipeline not found");
@@ -63,3 +65,23 @@ export async function deletePipelineService(id: string) {
 }
 
 
+export async function listSubscriptionsService(id: string) {
+    return listSubscriptions(id);
+}
+
+export async function addSubscriptionService(
+    data: NewSubscription
+) {
+    const parsed = addSubscriptionSchema.parse(data);
+    // this validates subsciption data before inserting into the DB.
+    return addSubscription(data);
+}
+
+export async function deleteSubscriptionService(id: string, subId: string) {
+    const existing = await getSubscription(subId);
+
+    if (!existing) {
+        throw new Error("Subscription not found");
+    }
+    return deleteSubscription(id, subId);
+}
