@@ -1,14 +1,21 @@
 import { Router } from "express";
 import {
-    createPipeline,
-    listPipelines,
-    deletePipeline
+    createPipelineHandler,
+    listPipelinesHandler,
+    getPipelineHandler,
+    updatePipelineHandler,
+    deletePipelineHandler,
 } from "../handlers/pipelines.handlers.js";
 
 const router = Router();
 
-router.post("/", createPipeline);
-router.get("/", listPipelines);
-router.delete("/:id", deletePipeline);
+router.route("/")
+    .post(createPipelineHandler)
+    .get(listPipelinesHandler);
+
+router.route("/:id")
+    .get(getPipelineHandler)
+    .patch(updatePipelineHandler)
+    .delete(deletePipelineHandler);
 
 export default router;

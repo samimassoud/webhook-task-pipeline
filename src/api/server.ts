@@ -1,6 +1,6 @@
 // This builds the server instance.
 import express from "express";
-import routes from "./routes";
+import routes from "./routes/index.js";
 
 export function startServer() {
     const app = express();

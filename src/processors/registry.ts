@@ -1,11 +1,12 @@
 import { httpEnrichConfigSchema } from "./configSchemas/httpEnrich.schema.js";
 import { httpEnrichProcessor } from "./implementations/httpEnrich.processor.js";
+import { Processor } from "./types.js";
 
-export const processorRegistry = {
-    httpEnrich: {
-        configSchema: httpEnrichConfigSchema,
-        run: httpEnrichProcessor
-    }
+export const processorRegistry: Record<string, Processor> = {
+  httpEnrich: {
+    configSchema: httpEnrichConfigSchema,
+    run: httpEnrichProcessor
+  }
 }
 
 /* 
