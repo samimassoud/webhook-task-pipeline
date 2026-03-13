@@ -11,6 +11,10 @@ export async function receiveWebhookHandler(
             return res.status(400).json({ error: "Pipeline ID is required" });
         }
 
+        // TO BE ADDED:
+        // The pipeline has a signing secret. The client will include X-Signature: sha256=<hash>
+        // We will get the signing key, the compute it for the payload (raw body) using the secret and check
+        // if it doesn't equal we return Unauthorized access 401 or Forbidden 403 and we don't add the job.
         const payload = req.body;
         const { jobId } = await enqueueJobService({
             pipelineId,

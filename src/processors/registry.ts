@@ -1,11 +1,23 @@
 import { httpEnrichConfigSchema } from "./configSchemas/httpEnrich.schema.js";
+import { jsonTransformConfigSchema } from "./configSchemas/jsonTransform.schema.js";
+import { textSummarizeConfigSchema } from "./configSchemas/textSummarize.schema.js";
 import { httpEnrichProcessor } from "./implementations/httpEnrich.processor.js";
+import { jsonTransformProcessor } from "./implementations/jsonTransform.processor.js";
+import { textSummarizeProcessor } from "./implementations/textSummarize.processor.js";
 import { Processor } from "./types.js";
 
 export const processorRegistry: Record<string, Processor> = {
+  jsonTransform: {
+    configSchema: jsonTransformConfigSchema,
+    run: jsonTransformProcessor
+  },
   httpEnrich: {
     configSchema: httpEnrichConfigSchema,
     run: httpEnrichProcessor
+  },
+  textSummarize: {
+    configSchema: textSummarizeConfigSchema,
+    run: textSummarizeProcessor
   }
 }
 

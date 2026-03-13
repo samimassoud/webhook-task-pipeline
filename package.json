@@ -12,7 +12,8 @@
     "worker": "node dist/worker/index.js",
     "serve": "npm run build && npm start",
     "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate"
+    "migrate": "drizzle-kit migrate",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +23,8 @@
     "@types/node": "^25.3.3",
     "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
