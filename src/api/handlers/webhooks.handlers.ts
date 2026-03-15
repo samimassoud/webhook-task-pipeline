@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { enqueueJobService } from "../../services/jobs.service.js";
 // Handlers parse request and call services
+// Not anyone should be able to create jobs on a pipeline
+// We'll require X-Signature, 
 export async function receiveWebhookHandler(
     req: Request,
     res: Response

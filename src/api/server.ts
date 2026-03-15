@@ -4,8 +4,14 @@ import routes from "./routes/index.js";
 
 export function startServer() {
     const app = express();
-
-    app.use(express.json());
+    // Signature verification must use the exact raw request body
+    // app.use(express.json) parses incoming JSON and replaces the body with a JSON object
+    // which destroys the original raw byes, meaning we can't reproduce the exact input for HMAC verification.
+    app.use(express.json({
+        verify: (req: any, res, buf) => {
+            req.rawBody = buf
+        }
+    })); // the verify middleware helps us capture the raw buffer before express parses it, and store it in req.rawBody.
 
     app.use("/api/v1", routes);
 
