@@ -7,6 +7,7 @@
 import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { getPipelineWithSecret } from "../../repositories/queries/pipelines.js";
+import { eq } from "drizzle-orm";
 
 export async function validateSignature(
     req: Request,
@@ -39,8 +40,7 @@ export async function validateSignature(
         }
 
         const secret = pipeline.signingSecret;
-
-        const rawBody = (req as any).rawBody; // JSON parsing modifies whitespace, which would break signature validation
+        const rawBody = req.rawBody; // JSON parsing modifies whitespace, which would break signature validation
         // rawBody field is added via a middle ware in src/api/server.ts
 
         if (!rawBody) {

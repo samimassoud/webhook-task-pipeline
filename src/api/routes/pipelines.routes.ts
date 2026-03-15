@@ -9,8 +9,11 @@ import {
     listSubscriptionsHandler,
     deleteSubscriptionHandler,
 } from "../handlers/pipelines.handlers.js";
+import { pipelineRateLimiter } from "../middleware/rateLimiters.js";
 
 const router = Router();
+
+router.use(pipelineRateLimiter);
 
 router.route("/")
     .post(createPipelineHandler)

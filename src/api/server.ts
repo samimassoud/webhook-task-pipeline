@@ -8,6 +8,7 @@ export function startServer() {
     // app.use(express.json) parses incoming JSON and replaces the body with a JSON object
     // which destroys the original raw byes, meaning we can't reproduce the exact input for HMAC verification.
     app.use(express.json({
+        limit: "1mb", // For webhook systems 1MB is more than enough (e.g., GitHub webhooks are usually <100KB)
         verify: (req: any, res, buf) => {
             req.rawBody = buf
         }
