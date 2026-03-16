@@ -2,7 +2,6 @@
 import { NewPipeline, NewSubscription } from "../repositories/schema.js";
 import { createPipeline, deletePipeline, getPipelineById, listPipelines, updatePipeline } from "../repositories/queries/pipelines.js";
 import { processorRegistry } from "../processors/registry.js";
-import { addSubscriptionSchema } from "../validation/jobs.schema.js";
 import { addSubscription, deleteSubscription, getSubscription, listSubscriptions } from "../repositories/queries/subscriptions.js";
 
 export async function createPipelineService(data: NewPipeline) {
@@ -72,8 +71,6 @@ export async function listSubscriptionsService(id: string) {
 export async function addSubscriptionService(
     data: NewSubscription
 ) {
-    const parsed = addSubscriptionSchema.parse(data);
-    // this validates subsciption data before inserting into the DB.
     return addSubscription(data);
 }
 

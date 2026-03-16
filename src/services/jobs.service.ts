@@ -39,24 +39,30 @@ export async function getJobWithAttemptsService(id: string) {
 
 export async function enqueueJobService({
     pipelineId,
-    payload
+    eventId,
+    payload,
 }: { // declare the type of the function's parameter object
     pipelineId: string;
+    eventId: string;
     payload: unknown;
 }) {
 
-    const pipeline = await getPipelineById(pipelineId);
+    try {
+        const job = await createJob({
+            pipelineId,
+            payload,
+            eventId,
+            status: "queued",
+            webhookStatus: "pending"
+        });
 
-    if (!pipeline) {
-        throw new Error("Pipeline not found");
+        return { jobId: job.id };
+    } catch (err: any) {
+        if (err.code === "23505") { // PostgreSQL unique violation error SQLSTATE 23505 https://www.postgresql.org/docs/current/errcodes-appendix.html
+            return { jobId: null } // handle gracefully,
+            // This means the job already exists, we'll return 202 and avoid duplicates (PER PIPELINE)
+        }
+        // else:
+        throw err
     }
-
-    const job = await createJob({
-        pipelineId,
-        payload,
-        status: "queued",
-        webhookStatus: "pending"
-    });
-
-    return { jobId: job.id };
 };

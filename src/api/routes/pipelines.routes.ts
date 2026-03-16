@@ -10,22 +10,32 @@ import {
     deleteSubscriptionHandler,
 } from "../handlers/pipelines.handlers.js";
 import { pipelineRateLimiter } from "../middleware/rateLimiters.js";
-
+import { createPipelineSchema, updatePipelineSchema } from "../../validation/pipelines.schema.js";
+import { createSubscriptionSchema } from "../../validation/subscriptions.schema.js";
+import { validateBody } from "../middleware/validateRequest.js";
 const router = Router();
 
 router.use(pipelineRateLimiter);
 
 router.route("/")
-    .post(createPipelineHandler)
+    .post(
+        validateBody(createPipelineSchema), // name, processorType and config
+        createPipelineHandler)
     .get(listPipelinesHandler);
 
 router.route("/:id")
     .get(getPipelineHandler)
-    .patch(updatePipelineHandler)
+    .patch(
+        validateBody(updatePipelineSchema), // optional: name, processorType and config, but nothing else.
+        updatePipelineHandler
+    )
     .delete(deletePipelineHandler);
 
 router.route("/:id/subscriptions")
-    .post(addSubscriptionHandler)
+    .post(
+        validateBody(createSubscriptionSchema), // callbackUrl
+        addSubscriptionHandler
+    )
     .get(listSubscriptionsHandler);
 
 router.route("/:id/subscriptions/:subId")

@@ -8,6 +8,27 @@
       "when": 1773153794072,
       "tag": "0000_curved_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773615800822,
+      "tag": "0001_powerful_white_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773616231698,
+      "tag": "0002_wet_dorian_gray",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773625461090,
+      "tag": "0003_purple_surge",
+      "breakpoints": true
     }
   ]
 }

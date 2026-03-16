@@ -5,7 +5,8 @@ import {
     jsonb,
     timestamp,
     integer,
-    pgEnum
+    pgEnum,
+    uniqueIndex
 } from "drizzle-orm/pg-core";
 
 /* =========================
@@ -73,6 +74,8 @@ export const jobs = pgTable("jobs", {
         .notNull()
         .references(() => pipelines.id),
 
+    eventId: text("event_id").notNull(),
+
     payload: jsonb("payload").notNull(),
 
     result: jsonb("result"),
@@ -99,6 +102,12 @@ export const jobs = pgTable("jobs", {
     startedAt: timestamp("started_at"),
 
     finishedAt: timestamp("finished_at"),
+}, (table) => {
+    return {
+        pipelineEventUnique: uniqueIndex("jobs_pipeline_event_id_idx")
+            .on(table.pipelineId, table.eventId),
+    };
+
 });
 
 /* =========================
