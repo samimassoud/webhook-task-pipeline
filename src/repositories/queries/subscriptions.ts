@@ -7,15 +7,41 @@ export async function addSubscription(data: NewSubscription) {
     return result;
 }
 export async function listSubscriptions(id: string) {
-    const result = await db.select().from(subscriptions);
-    return result;
-}
-export async function getSubscription(id: string) {
-    const [result] = await db.select()
+    const result = await db.select()
         .from(subscriptions)
-        .where(eq(subscriptions.id, id));
+        .where(eq(subscriptions.pipelineId, id))
     return result;
 }
+export async function getSubscriptionByPipelineAndUrl(
+    pipelineId: string,
+    callbackUrl: string
+) {
+    const [result] = await db
+        .select()
+        .from(subscriptions)
+        .where(
+            and(
+                eq(subscriptions.pipelineId, pipelineId),
+                eq(subscriptions.callbackUrl, callbackUrl)
+            )
+        );
+
+    return result ?? null;
+}
+
+export async function getSubscription(pipelineId: string, subscriptionId: string) {
+    const [result] = await db
+        .select()
+        .from(subscriptions)
+        .where(
+            and(
+                eq(subscriptions.id, subscriptionId),
+                eq(subscriptions.pipelineId, pipelineId)
+            )
+        );
+    return result ?? null;
+}
+
 export async function deleteSubscription(id: string, subId: string) {
     const [result] = await db.delete(subscriptions)
         .where(and(

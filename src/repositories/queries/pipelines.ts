@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db.js";
 import { NewPipeline, NewSubscription, pipelines, subscriptions } from "../schema.js";
-
 // Utility to strip signingSecret before returning
 function sanitizePipeline<T extends { signingSecret?: string }>(pipeline: T) {
     // Destructure the object, pulling out signingSecret
@@ -19,14 +18,21 @@ export async function createPipeline(data: NewPipeline) {
 }
 
 export async function listPipelines() {
-    const result = await db.select().from(pipelines);
-    return result.map(sanitizePipeline);
+    try {
+        const result = await db.select().from(pipelines);
+        return result.map(sanitizePipeline);
+    } catch (err) {
+        console.log("DB URL:", process.env.DATABASE_URL);
+        console.error("Pipeline query failed:", err);
+        throw err;
+    }
 }
 
 export async function getPipelineById(id: string) {
     const [result] = await db.select()
         .from(pipelines)
-        .where(eq(pipelines.id, id))
+        .where(eq(pipelines.id, id));
+
     return result ? sanitizePipeline(result) : null;
 }
 
@@ -59,5 +65,6 @@ export async function deletePipeline(
     const [result] = await db.delete(pipelines)
         .where(eq(pipelines.id, id))
         .returning();
-    return sanitizePipeline(result);
+    console.log("Delete result:", result);
+    return result ? sanitizePipeline(result) : null;
 }

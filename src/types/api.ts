@@ -1,7 +1,3 @@
-/* EXAMPLE
-export interface CreatePipelineRequest {
-  name: string
-  processorType: string
-  config: unknown
-}
-*/
+import { NewPipeline } from "../repositories/schema.js";
+
+export type UpdatePipelineInput = Omit<Partial<NewPipeline>, "signingSecret">;

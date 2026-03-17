@@ -1,6 +1,7 @@
 // Handlers parse request and call services
 import { Request, Response } from "express";
 import { addSubscriptionService, createPipelineService, deletePipelineService, deleteSubscriptionService, getPipelineService, listPipelinesService, listSubscriptionsService, updatePipelineService } from "../../services/pipelines.service.js";
+import { validate as isUuid } from "uuid";
 
 export async function createPipelineHandler(req: Request, res: Response) {
     try {
@@ -51,13 +52,15 @@ export async function updatePipelineHandler(req: Request, res: Response) {
 }
 
 export async function deletePipelineHandler(req: Request, res: Response) {
+    const id = req.params.id as string;
+
+    if (!id) {
+        return res.status(400).json({ error: "Pipeline ID is required" });
+    }
+    if (!isUuid(id)) {
+        return res.status(400).json({ error: "Invalid pipeline ID format" });
+    }
     try {
-        const id = req.params.id as string;
-
-        if (!id) {
-            return res.status(400).json({ error: "Pipeline ID is required" });
-        }
-
         await deletePipelineService(id);
         res.status(204).send();
 
@@ -115,10 +118,10 @@ export async function deleteSubscriptionHandler(
     try {
         const id = req.params.id as string;
         const subId = req.params.subId as string;
-        if (!id) {
+        if (!id || !isUuid(id)) {
             return res.status(400).json({ error: "Pipeline ID is required" });
         }
-        if (!subId) {
+        if (!subId || !isUuid(subId)) {
             return res.status(400).json({ error: "Subscription ID is required" });
         }
         await deleteSubscriptionService(id, subId);

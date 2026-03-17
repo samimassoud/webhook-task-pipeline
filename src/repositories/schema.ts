@@ -61,6 +61,11 @@ export const subscriptions = pgTable("subscriptions", {
     callbackUrl: text("callback_url").notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        pipelineCallbackUnique: uniqueIndex("pipeline_callback_unique")
+            .on(table.pipelineId, table.callbackUrl),
+    };
 });
 
 /* =========================
@@ -72,7 +77,7 @@ export const jobs = pgTable("jobs", {
 
     pipelineId: uuid("pipeline_id")
         .notNull()
-        .references(() => pipelines.id),
+        .references(() => pipelines.id, { onDelete: "cascade" }),
 
     eventId: text("event_id").notNull(),
 
