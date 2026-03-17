@@ -1,157 +1,106 @@
 # Webhook-Driven Task Processing Pipeline
 
-## 📌 Project Type
-
-This project is an **event-driven backend service** that processes inbound webhooks asynchronously through a background job system and delivers results to registered subscribers.
-
-It is a simplified automation engine — similar in concept to systems like Zapier — where:
-
-1. An incoming webhook triggers an event
-2. The event is queued as a job
-3. A worker processes the job
-4. The processed result is delivered to one or more subscribers
-
-The system emphasizes **clean architecture**, **reliability**, **separation of concerns**, and **asynchronous processing**.
+An event-driven backend service that receives webhooks, processes them asynchronously through a background job system, and delivers results to registered subscribers. Conceptually similar to Zapier — an inbound event triggers a processing step, and the result is forwarded to one or more destinations.
 
 ---
 
-## 🧰 Tech Stack
+## How It Works
+
+1. A client sends a webhook to a pipeline's ingest URL
+2. The system queues a job and responds immediately with `202 Accepted`
+3. A background worker picks up the job and runs the configured processor
+4. The result is stored and delivered to all registered subscriber URLs
+5. If delivery fails, the system retries on an exponential backoff schedule
+6. Regardless of delivery outcome, the result is always retrievable via the jobs API
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
 | Language | TypeScript |
 | Runtime | Node.js |
-| HTTP Layer | Express |
+| HTTP Framework | Express |
 | Database | PostgreSQL |
+| ORM | Drizzle |
 | Containerization | Docker & Docker Compose |
 | CI/CD | GitHub Actions |
 
-The system is designed to run fully locally using:
+---
+
+## Project Structure
+
+```
+src/
+  api/          HTTP layer — routes, validation, request handling
+  worker/       Background job processor and webhook delivery worker
+  processors/   Pluggable processing action implementations
+  services/     Business logic and orchestration
+  repositories/ All database access
+  types/        Shared TypeScript interfaces
+```
+
+The API server and worker run as two separate processes, sharing the same database. In development they are started independently; in production they run as separate containers under Docker Compose.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+
+### Run
 
 ```bash
 docker compose up
 ```
 
----
+This starts PostgreSQL, runs database migrations, and launches both the API server and the background worker.
 
-## 🏗 Architecture Overview
+The API is available at `http://localhost:3000`.
 
-The project follows a modular, layered structure to ensure clear separation of concerns.
+### Development
 
+To run the two processes locally without Docker:
+
+```bash
+# Terminal 1 — API server
+npm run dev:api
+
+# Terminal 2 — Background worker
+npm run dev:worker
 ```
-/src
-  /api
-  /worker
-  /processors
-  /services
-  /repositories
-  /types
-```
 
-### 📂 `/api`
-Contains the HTTP layer.
-
-**Responsibilities:**
-- Define Express routes
-- Handle request validation
-- Insert jobs into the queue
-- Manage CRUD operations for pipelines
-- Return appropriate HTTP responses
-
-> This layer does not contain business logic.
+Requires a running PostgreSQL instance. Configure the connection via `DATABASE_URL` in a `.env` file (see `.env.example`).
 
 ---
 
-### 📂 `/worker`
-Contains the background job processor.
+## Processors
 
-**Responsibilities:**
-- Poll queued jobs
-- Update job status transitions
-- Execute processing actions
-- Trigger delivery to subscribers
-- Handle retry logic
+Each pipeline is configured with one of three processor types:
 
-> The worker runs independently from the API server.
+| Processor | Description |
+|---|---|
+| `httpEnrich` | Looks up a payload field against an external HTTP API and merges the response |
+| `jsonTransform` | Restructures a JSON payload by extracting, renaming, and adding fields |
+| `textSummarize` | Extracts a text field and returns a sentence summary with keyword extraction |
 
 ---
 
-### 📂 `/processors`
-Contains pluggable processing action implementations.
+## API Reference
 
-Each processor:
-- Accepts an input payload
-- Applies transformation or logic
-- Returns processed output
-
-> This layer allows new processing types to be added without modifying core infrastructure logic.
+Full API documentation — including endpoint specs, processor config schemas, payload requirements, error responses, and rate limits — is in [`src/api/README.md`](src/api/README.md).
 
 ---
 
-### 📂 `/services`
-Contains business logic.
+## CI/CD
 
-**Responsibilities:**
-- Orchestrate job execution
-- Manage retry behavior
-- Coordinate delivery logic
-- Handle state transitions
+GitHub Actions runs on every push and pull request:
 
-> This layer connects repositories and processors together.
-
----
-
-### 📂 `/repositories`
-Responsible for database interaction.
-
-**Responsibilities:**
-- Query pipelines
-- Insert jobs
-- Update job statuses
-- Store delivery attempts
-- Persist subscriber data
-
-> All database access is centralized here to keep the architecture clean and testable.
-
----
-
-### 📂 `/types`
-Shared TypeScript types and interfaces used across the application.
-
-This ensures:
-- Strong typing across layers
-- Clear contracts between modules
-- Easier refactoring and maintainability
-
----
-
-## 🎯 Design Philosophy
-
-This project is intentionally built with:
-
-- **Clear separation** between API and worker
-- **Asynchronous** job processing
-- **Durable** job storage in the database
-- **Extensible** processing actions
-- **Reliability** as a first-class concern
-
-The goal is not just functionality, but architectural clarity and production-style thinking.
-
----
-
-## 🚧 Current Status
-
-Initial project skeleton and modular structure have been created.
-
-**Next steps include:**
-- [ ] Database schema design
-- [ ] Pipeline CRUD implementation
-- [ ] Webhook ingestion endpoint
-- [ ] Job queue implementation
-- [ ] Background worker processing loop
-
----
-
-## 📦 Running the Project *(Coming Soon)*
-
-Full Docker Compose setup and environment configuration will be documented once the core services are implemented.
+- Type checking with `tsc --noEmit`
+- Linting
+- Tests against a real PostgreSQL instance
+- Build verification
+- Docker Compose smoke test on `main`
