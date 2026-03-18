@@ -280,7 +280,7 @@ Same shape as a single item from List Pipelines.
 PATCH /pipelines/:id
 ```
 
-Only `name` and `config` may be updated. `processorType` and `signingSecret` cannot be changed after creation. The `config` object is re-validated against the pipeline's processor type on every update.
+Only `name`, `config` and `processorType` may be updated. `signingSecret` cannot be changed after creation. The `config` object is re-validated against the pipeline's processor type on every update, ensuring consistency and valid configuration.
 
 #### Request Body
 
@@ -376,7 +376,7 @@ DELETE /pipelines/:id/subscriptions/:subId
 
 ## Webhook Ingestion
 
-This is the trigger endpoint. Sending a request here creates a job and queues it for background processing. The response is immediate — processing happens asynchronously.
+This is the trigger endpoint. Sending a request here creates a job and enqueues it for background processing. The response is immediate — processing happens asynchronously.
 
 ```
 POST /webhooks/:pipelineId
