@@ -88,7 +88,7 @@ export async function addSubscriptionHandler(
         res.status(201).json(subscription);
 
     } catch (err) {
-        res.status(404).json({ error: (err as Error).message });
+        res.status(409).json({ error: (err as Error).message });
     }
 }
 
