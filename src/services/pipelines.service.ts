@@ -101,8 +101,6 @@ export async function addSubscriptionService(
 }
 
 export async function deleteSubscriptionService(id: string, subId: string) {
-    console.log(`passing id: ${id} and subId: ${subId} in service`);
-
     const existing = await getSubscription(id, subId);
 
     if (!existing) {
