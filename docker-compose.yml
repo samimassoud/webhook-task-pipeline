@@ -21,6 +21,14 @@ services:
       DATABASE_URL: postgres://pipeline:pipeline@postgres:5432/pipeline_db
     depends_on:
       - postgres
+  worker:
+    build: .
+    container_name: pipeline_worker
+    command: sh -c "npm run migrate && node dist/worker/index.js"
+    environment:
+      DATABASE_URL: postgres://pipeline:pipeline@postgres:5432/pipeline_db
+    depends_on:
+      - api
 
 volumes:
   postgres_data:
