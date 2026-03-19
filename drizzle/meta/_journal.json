@@ -43,6 +43,13 @@
       "when": 1773785902102,
       "tag": "0005_long_cloak",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773896921367,
+      "tag": "0006_daffy_jazinda",
+      "breakpoints": true
     }
   ]
 }

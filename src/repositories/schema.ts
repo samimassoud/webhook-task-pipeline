@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm";
+import { index } from "drizzle-orm/gel-core";
 import {
     pgTable,
     uuid,
@@ -101,6 +103,7 @@ export const jobs = pgTable("jobs", {
 
     nextWebhookAttemptAt: timestamp("next_webhook_attempt_at")
         .defaultNow(),
+    lockedAt: timestamp("locked_at"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
 
@@ -111,6 +114,13 @@ export const jobs = pgTable("jobs", {
     return {
         pipelineEventUnique: uniqueIndex("jobs_pipeline_event_id_idx")
             .on(table.pipelineId, table.eventId),
+        statusIdx: index("jobs_status_idx")
+            .on(sql`${table.status}`),
+        webhookPollingIdx: index("jobs_webhook_polling_idx")
+            .on(sql`${table.webhookStatus}`, sql`${table.nextWebhookAttemptAt}`),
+
+        lockedAtIdx: index("jobs_locked_at_idx")
+            .on(sql`${table.lockedAt}`),
     };
 
 });
