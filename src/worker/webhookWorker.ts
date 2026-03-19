@@ -49,7 +49,21 @@ async function claimNextDelivery() {
             FOR UPDATE SKIP LOCKED
             LIMIT 1
         )
-        RETURNING *;
+        RETURNING 
+      id,
+      pipeline_id AS "pipelineId",
+      event_id AS "eventId",
+      payload,
+      result,
+      status,
+      webhook_status AS "webhookStatus",
+      webhook_attempts AS "webhookAttempts",
+      next_webhook_attempt_at AS "nextWebhookAttemptAt",
+      locked_at AS "lockedAt",
+      created_at AS "createdAt",
+      started_at AS "startedAt",
+      finished_at AS "finishedAt";
+
     `);
 
     return result[0] || null;
