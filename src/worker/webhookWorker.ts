@@ -37,7 +37,7 @@ export async function runWebhookWorker() {
 async function claimNextDelivery() {
     const result = await db.execute(sql`
         UPDATE jobs
-        SET "locked_at" = NOW(),
+        SET "locked_at" = NOW()
         WHERE id = (
             SELECT j.id
             FROM jobs j
