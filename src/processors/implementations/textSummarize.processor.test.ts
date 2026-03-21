@@ -43,7 +43,7 @@ describe("textSummarizeProcessor", () => {
         const badPayload = { body: 123 };
 
         await expect(
-            textSummarizeProcessor(badPayload as any, config)
+            textSummarizeProcessor(badPayload as Record<string, unknown>, config)
         ).rejects.toThrow();
 
     })

@@ -1,21 +1,10 @@
-// Business Logic
-/*
-This layer will handle:
+interface DatabaseError extends Error {
+    code?: string;
+}
 
-validation
-business logic
-processor selection
-job orchestration
-webhook delivery
-
-Your services will become the brain of the system.
-*/
 
 import { JobStatus } from "../types/jobs.js";
 import { createJob, getJobById, listDeliveryAttemptsByJobId, listJobs } from "../repositories/queries/jobs.js";
-import { deliveryAttempts } from "../repositories/schema.js";
-import { getPipelineById } from "../repositories/queries/pipelines.js";
-
 export async function listJobsService(
     filters?: {
         pipelineId?: string;
@@ -63,8 +52,10 @@ export async function enqueueJobService({
         });
 
         return { jobId: job.id };
-    } catch (err: any) {
-        if (err.code === "23505") { // PostgreSQL unique violation error SQLSTATE 23505 https://www.postgresql.org/docs/current/errcodes-appendix.html
+    } catch (err: unknown) {
+        const dbErr = err as DatabaseError;
+        if (dbErr.code === "23505") {
+            // PostgreSQL unique violation error SQLSTATE 23505 https://www.postgresql.org/docs/current/errcodes-appendix.html
             return { jobId: null } // handle gracefully,
             // This means the job already exists, we'll return 202 and avoid duplicates (PER PIPELINE)
         }
