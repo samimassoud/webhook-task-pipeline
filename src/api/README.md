@@ -526,7 +526,7 @@ GET /jobs/:id
 | `webhookStatus` | Meaning |
 |---|---|
 | `pending` | Result is ready; delivery has not yet been attempted or is scheduled for retry |
-| `delivered` | At least one subscriber received a `2xx` response |
+| `delivered` | All subscription delivery attempts succeeded and returned a `2xx` response |
 | `failed` | All retry attempts were exhausted without a successful delivery |
 | `skipped` | The pipeline has no subscriptions; no delivery was attempted |
 
