@@ -280,7 +280,7 @@ Same shape as a single item from List Pipelines.
 PATCH /pipelines/:id
 ```
 
-Only `name`, `config` and `processorType` may be updated. `signingSecret` cannot be changed after creation. The `config` object is re-validated against the pipeline's processor type on every update, ensuring consistency and valid configuration.
+Only `name` and `config` may be updated. `processorType` and `signingSecret` cannot be changed after creation. The `config` object is re-validated against the pipeline's processor type on every update.
 
 #### Request Body
 
@@ -376,7 +376,7 @@ DELETE /pipelines/:id/subscriptions/:subId
 
 ## Webhook Ingestion
 
-This is the trigger endpoint. Sending a request here creates a job and enqueues it for background processing. The response is immediate — processing happens asynchronously.
+This is the trigger endpoint. Sending a request here creates a job and queues it for background processing. The response is immediate — processing happens asynchronously.
 
 ```
 POST /webhooks/:pipelineId
@@ -466,9 +466,54 @@ Jobs represent individual pipeline executions triggered by an inbound webhook. A
 GET /jobs
 ```
 
+Optional query parameters:
+
+- `pipelineId` — filter jobs by pipeline ID
+- `status` — filter jobs by job status (`queued`, `processing`, `success`, `failed`)
+
+#### Example Requests
+
+```http
+GET /jobs
+GET /jobs?pipelineId=3fa85f64-5717-4562-b3fc-2c963f66afa6
+GET /jobs?status=success
+GET /jobs?pipelineId=3fa85f64-5717-4562-b3fc-2c963f66afa6&status=failed
+```
+
 #### Response — `200 OK`
 
-Returns an array of job objects (see structure below).
+Returns an array of job objects.
+
+```json
+[
+  {
+    "id": "b3fb8a31-6c1a-4e8d-9af7-3f2d5e4c1a77",
+    "pipelineId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "eventId": "evt-2024-001",
+    "payload": {
+      "eventId": "evt-2024-001",
+      "ip": "8.8.8.8"
+    },
+    "result": {
+      "ip": "8.8.8.8",
+      "enrichment": {
+        "city": "Mountain View",
+        "country": "US",
+        "org": "Google LLC"
+      }
+    },
+    "errorMessage": null,
+    "status": "success",
+    "webhookStatus": "delivered",
+    "webhookAttempts": 1,
+    "nextWebhookAttemptAt": "2024-01-15T10:05:10.000Z",
+    "lockedAt": null,
+    "createdAt": "2024-01-15T10:05:00.000Z",
+    "startedAt": "2024-01-15T10:05:01.000Z",
+    "finishedAt": "2024-01-15T10:05:03.000Z"
+  }
+]
+```
 
 ---
 
@@ -489,7 +534,6 @@ GET /jobs/:id
     "eventId": "evt-2024-001",
     "ip": "8.8.8.8"
   },
-  "status": "success",
   "result": {
     "ip": "8.8.8.8",
     "enrichment": {
@@ -498,19 +542,56 @@ GET /jobs/:id
       "org": "Google LLC"
     }
   },
+  "errorMessage": null,
+  "status": "success",
   "webhookStatus": "delivered",
-  "deliveryAttempts": [
-    {
-      "id": "...",
-      "attemptNumber": 1,
-      "statusCode": 200,
-      "attemptedAt": "2024-01-15T10:05:30.000Z"
-    }
-  ],
+  "webhookAttempts": 1,
+  "nextWebhookAttemptAt": "2024-01-15T10:05:10.000Z",
+  "lockedAt": null,
   "createdAt": "2024-01-15T10:05:00.000Z",
-  "updatedAt": "2024-01-15T10:05:30.000Z"
+  "startedAt": "2024-01-15T10:05:01.000Z",
+  "finishedAt": "2024-01-15T10:05:03.000Z"
 }
 ```
+
+---
+
+### Get Delivery Attempts for a Job
+
+```
+GET /jobs/:id/deliveries
+```
+
+Returns all webhook delivery attempts recorded for the given job.
+
+#### Response — `200 OK`
+
+```json
+[
+  {
+    "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "jobId": "b3fb8a31-6c1a-4e8d-9af7-3f2d5e4c1a77",
+    "subscriptionId": "9d5b8c5d-2f67-4e8f-9a11-7d1c2a9a1234",
+    "attemptNumber": 1,
+    "statusCode": 500,
+    "responseBody": "Internal Server Error",
+    "errorMessage": null,
+    "attemptedAt": "2024-01-15T10:05:10.000Z"
+  },
+  {
+    "id": "3f1c84d4-12ab-4f91-9d88-1d93b87df321",
+    "jobId": "b3fb8a31-6c1a-4e8d-9af7-3f2d5e4c1a77",
+    "subscriptionId": "9d5b8c5d-2f67-4e8f-9a11-7d1c2a9a1234",
+    "attemptNumber": 2,
+    "statusCode": 200,
+    "responseBody": "ok",
+    "errorMessage": null,
+    "attemptedAt": "2024-01-15T10:05:20.000Z"
+  }
+]
+```
+
+---
 
 ### Job Status Values
 
@@ -542,7 +623,7 @@ The webhook delivery worker retries failed deliveries on the following schedule:
 | 4 | 10 minutes |
 | 5 | 1 hour |
 
-After the fifth failed attempt, `webhookStatus` is set to `failed`. The job result remains accessible via `GET /jobs/:id`.
+After the fifth failed attempt, `webhookStatus` is set to `failed`. Individual delivery attempt records remain accessible via `GET /jobs/:id/deliveries`, and the processed job remains accessible via `GET /jobs/:id`.
 
 ---
 
