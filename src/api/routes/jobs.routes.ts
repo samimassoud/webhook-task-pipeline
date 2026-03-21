@@ -1,7 +1,8 @@
 import { Router } from "express";
 import {
     listJobsHandler,
-    getJobHandler
+    getJobHandler,
+    listJobDeliveriesHandler
 } from "../handlers/jobs.handlers.js";
 import { jobsRateLimiter } from "../middleware/rateLimiters.js";
 
@@ -12,6 +13,8 @@ router.use(jobsRateLimiter);
 router.route("/")
     .get(listJobsHandler);
 router.route("/:id")
-    .get(getJobHandler)
+    .get(getJobHandler);
+router.route("/:id/deliveries")
+    .get(listJobDeliveriesHandler);
 
 export default router;

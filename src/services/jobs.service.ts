@@ -23,18 +23,24 @@ export async function listJobsService(
     }
 ) {
     return listJobs(filters);
-}
+};
 
-export async function getJobWithAttemptsService(id: string) {
+export async function getJobService(id: string) {
     const job = await getJobById(id);
     if (!job) {
         throw new Error("Job not found");
     }
-    const attempts = await listDeliveryAttemptsByJobId(id);
-    return {
-        ...job,
-        deliveryAttempts: attempts
+    return job;
+};
+
+export async function listJobDeliveriesService(jobId: string) {
+    const job = await getJobById(jobId);
+
+    if (!job) {
+        throw new Error("Job not found");
     }
+
+    return listDeliveryAttemptsByJobId(jobId);
 }
 
 export async function enqueueJobService({

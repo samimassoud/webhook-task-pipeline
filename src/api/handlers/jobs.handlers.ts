@@ -1,7 +1,7 @@
 // Handlers parse request and call services
 
 import { Request, Response } from "express";
-import { listJobsService, getJobWithAttemptsService } from "../../services/jobs.service.js";
+import { listJobsService, listJobDeliveriesService, getJobService } from "../../services/jobs.service.js";
 import { JobStatus } from "../../types/jobs.js";
 
 export async function listJobsHandler(
@@ -26,8 +26,26 @@ export async function getJobHandler(
         if (!id) {
             return res.status(400).json({ error: "Job ID is required" });
         }
-        const job = await getJobWithAttemptsService(id);
+        const job = await getJobService(id);
         res.status(200).json(job);
+    } catch (err) {
+        res.status(404).json({ error: (err as Error).message });
+    }
+}
+
+export async function listJobDeliveriesHandler(
+    req: Request,
+    res: Response
+) {
+    try {
+        const id = req.params.id as string;
+
+        if (!id) {
+            return res.status(400).json({ error: "Job ID is required" });
+        }
+
+        const attempts = await listJobDeliveriesService(id);
+        res.status(200).json(attempts);
     } catch (err) {
         res.status(404).json({ error: (err as Error).message });
     }

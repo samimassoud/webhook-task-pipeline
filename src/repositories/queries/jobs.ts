@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, asc } from "drizzle-orm";
 import { db } from "../db.js";
 import { deliveryAttempts, jobs, NewJob } from "../schema.js";
 import { JobStatus } from "src/types/jobs.js";
@@ -45,5 +45,6 @@ export async function listDeliveryAttemptsByJobId(jobId: string) {
     return db
         .select()
         .from(deliveryAttempts)
-        .where(eq(deliveryAttempts.jobId, jobId));
+        .where(eq(deliveryAttempts.jobId, jobId))
+        .orderBy(asc(deliveryAttempts.attemptNumber), asc(deliveryAttempts.attemptedAt));
 }
