@@ -2,9 +2,12 @@ import { JsonTransformConfig } from "../configSchemas/jsonTransform.schema.js";
 
 // Helper function for dot-path extraction, handled via path.split(".")
 function getValueByPath(obj: Record<string, unknown>, path: string) {
-    return path.split(".").reduce((acc: any, key) => {
-        if (acc == null) return undefined;
-        return acc[key];
+    return path.split(".").reduce<unknown>((acc, key) => {
+        if (acc === null || acc === undefined) return undefined;
+        if (typeof acc === "object" && acc !== null && key in acc) {
+            return (acc as Record<string, unknown>)[key];
+        }
+        return undefined;
     }, obj);
 
     // .reduce(...) walks through the object using the path array, accumulating it per iteration

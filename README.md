@@ -73,7 +73,7 @@ npm run dev:api
 npm run dev:worker
 ```
 
-Requires a running PostgreSQL instance. Configure the connection via `DATABASE_URL` in a `.env` file (see `.env.example`).
+Requires a running PostgreSQL instance. Configure the connection via `DATABASE_URL` in a `.env` file.
 
 ---
 
@@ -89,18 +89,22 @@ Each pipeline is configured with one of three processor types:
 
 ---
 
-## API Reference
+## Documentation
 
-Full API documentation — including endpoint specs, processor config schemas, payload requirements, error responses, and rate limits — is in [`src/api/README.md`](src/api/README.md).
+- **API reference** — endpoint specs, processor config schemas, payload requirements, error responses, and rate limits: [`src/api/README.md`](src/api/README.md)
+- **Worker internals** — job lifecycle, webhook delivery, retry logic, and crash recovery: [`src/worker/README.md`](src/worker/README.md)
 
 ---
 
 ## CI/CD
 
-GitHub Actions runs on every push and pull request:
+GitHub Actions runs on pull requests targeting `main` as a confidence pipeline.
+
+It currently verifies:
 
 - Type checking with `tsc --noEmit`
 - Linting
-- Tests against a real PostgreSQL instance
-- Build verification
-- Docker Compose smoke test on `main`
+- Unit tests with Vitest
+- Docker image build verification
+
+This workflow does not deploy or publish images. It is used to catch issues early before merging.

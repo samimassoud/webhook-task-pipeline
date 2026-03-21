@@ -7,7 +7,6 @@
 import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { getPipelineWithSecret } from "../../repositories/queries/pipelines.js";
-import { eq } from "drizzle-orm";
 
 export async function validateSignature(
     req: Request,

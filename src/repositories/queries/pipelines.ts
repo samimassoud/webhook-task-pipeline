@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db.js";
-import { NewPipeline, NewSubscription, pipelines, subscriptions } from "../schema.js";
+import { NewPipeline, pipelines } from "../schema.js";
 // Utility to strip signingSecret before returning
 function sanitizePipeline<T extends { signingSecret?: string }>(pipeline: T) {
     // Destructure the object, pulling out signingSecret
-    const { signingSecret, ...safe } = pipeline;
+    const safe = { ...pipeline };
+    delete safe.signingSecret;
     // Return everything except signingSecret
     return safe;
 }

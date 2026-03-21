@@ -1,6 +1,6 @@
 import { db } from "../repositories/db.js";
 import { Job, jobs, pipelines } from "../repositories/schema.js";
-import { eq, isNull, and, lte, sql } from "drizzle-orm";
+import { eq, and, lte, sql } from "drizzle-orm";
 import { processorRegistry } from "../processors/registry.js";
 
 const POLL_INTERVAL_MS = 2000;
@@ -62,8 +62,11 @@ async function processJob(job: Job & { config: unknown; processorType: string })
 
         const safeResult = JSON.parse(JSON.stringify(result)); // Ensuring the processor's output is JSON-safe
         await markJobSuccess(job.id, safeResult);
-    } catch (err: any) {
-        await markJobFailed(job.id, err.message || "Unknown error");
+    } catch (err: unknown) {
+        const errorMessage =
+            err instanceof Error ? err.message : String(err);
+
+        await markJobFailed(job.id, errorMessage || "Unknown error");
     }
 }
 

@@ -18,7 +18,7 @@ describe("httpEnrichProcessor", () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
             json: async () => mockResponse
-        } as any);
+        } as Partial<Response>);
         // This overrides global.fetch which means that any call to fetch()
         // returns our mockResponse
 
@@ -71,7 +71,7 @@ describe("httpEnrichProcessor", () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: false,
             status: 500
-        } as any);
+        } as Partial<Response>);
 
         const payload = {
             ip: "8.8.8.8"
@@ -96,7 +96,7 @@ describe("httpEnrichProcessor", () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
             json: async () => ({})
-        } as any);
+        } as Partial<Response>);
 
         const payload = {
             ip: "1.2.3.4"

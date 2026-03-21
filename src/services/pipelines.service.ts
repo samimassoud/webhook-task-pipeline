@@ -42,8 +42,8 @@ export async function updatePipelineService(id: string, data: UpdatePipelineInpu
         throw new Error("Pipeline to be updated was not found");
     }
     // For extra security
-    if ("signingSecret" in data) {
-        delete (data as any).signingSecret;
+    if ("signingSecret" in (data as Record<string, unknown>)) {
+        delete (data as Record<string, unknown>).signingSecret;
     }
     // We determine processor type: updated? if not then it's the existing's.
     const processorType = data.processorType ?? existing.processorType;

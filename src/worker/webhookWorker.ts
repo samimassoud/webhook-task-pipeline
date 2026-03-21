@@ -142,12 +142,16 @@ async function attemptDelivery(job: Job, sub: Subscription, pipeline: Pipeline):
 
         return response.ok;
 
-    } catch (err: any) {
+    } catch (err: unknown) {
+        const errorMessage =
+            err instanceof Error ? err.message : String(err);
+
+
         await logDeliveryAttempt({
             jobId: job.id,
             subId: sub.id,
             attemptNumber,
-            errorMessage: err.message
+            errorMessage: errorMessage
         });
 
         return false;

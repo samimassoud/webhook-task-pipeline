@@ -62,7 +62,7 @@ function topKeywords(freq: Record<string, number>, count: number) {
 
 // the processor:
 export async function textSummarizeProcessor(
-    payload: Record<string, any>,
+    payload: Record<string, unknown>,
     config: TextSummarizeConfig
 ) {
 
