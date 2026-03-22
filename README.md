@@ -1,5 +1,6 @@
 # Webhook-Driven Task Processing Pipeline
 ![CI](https://github.com/samimassoud/webhook-task-pipeline/actions/workflows/ci.yml/badge.svg)
+
 An event-driven backend service that receives webhooks, processes them asynchronously through a background job system, and delivers results to registered subscribers. Conceptually similar to Zapier — an inbound event triggers a processing step, and the result is forwarded to one or more destinations.
 
 ---
