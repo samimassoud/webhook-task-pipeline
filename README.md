@@ -1,5 +1,5 @@
 # Webhook-Driven Task Processing Pipeline
-
+![CI](https://github.com/samimassoud/webhook-task-pipeline/actions/workflows/ci.yml/badge.svg)
 An event-driven backend service that receives webhooks, processes them asynchronously through a background job system, and delivers results to registered subscribers. Conceptually similar to Zapier — an inbound event triggers a processing step, and the result is forwarded to one or more destinations.
 
 ---
@@ -51,15 +51,20 @@ The API server and worker run as two separate processes, sharing the same databa
 
 - Docker and Docker Compose
 
+### Clone
+
+```bash
+git clone https://github.com/samimassoud/webhook-task-pipeline.git
+cd webhook-task-pipeline
+```
+
 ### Run
 
 ```bash
 docker compose up
 ```
 
-This starts PostgreSQL, runs database migrations, and launches both the API server and the background worker.
-
-The API is available at `http://localhost:3000`.
+This starts PostgreSQL, runs database migrations, and launches both the API server and the background worker. The API is available at `http://localhost:3000`.
 
 ### Development
 
@@ -99,7 +104,6 @@ Each pipeline is configured with one of three processor types:
 ## CI/CD
 
 GitHub Actions runs on pull requests targeting `main` as a confidence pipeline.
-
 It currently verifies:
 
 - Type checking with `tsc --noEmit`
