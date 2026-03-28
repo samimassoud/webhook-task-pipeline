@@ -107,7 +107,7 @@ Updates the job to:
 - `finishedAt = NOW()`
 - `lockedAt = null`
 
-Setting `webhookStatus` to `pending` is what hands the job off to the webhook worker.
+Setting `status` to `success` is what hands the job off to the webhook worker.
 
 ### `markJobFailed(jobId, errorMessage)`
 
