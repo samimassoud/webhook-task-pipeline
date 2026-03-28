@@ -280,7 +280,7 @@ Same shape as a single item from List Pipelines.
 PATCH /pipelines/:id
 ```
 
-Only `name` and `config` may be updated. `processorType` and `signingSecret` cannot be changed after creation. The `config` object is re-validated against the pipeline's processor type on every update.
+Only `name` and `config` and `processorType` may be updated.  `signingSecret` cannot be changed after creation. The `config` object is re-validated against the pipeline's processor type on every update of either or both.
 
 #### Request Body
 
